@@ -13,6 +13,7 @@
 namespace zen::runtime {
 
 class Module;
+class EVMModule;
 class Instance;
 class Runtime;
 

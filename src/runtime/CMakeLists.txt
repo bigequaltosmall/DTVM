@@ -7,6 +7,7 @@ set(RUNTIME_SRCS
     runtime.cpp
     isolation.cpp
     module.cpp
+    evm_module.cpp
     instance.cpp
     codeholder.cpp
     destroyer.cpp

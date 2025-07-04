@@ -12,6 +12,7 @@ namespace zen::runtime {
 class CodeHolder;
 class HostModule;
 class Module;
+class EVMModule;
 class Instance;
 class Isolation;
 class SymbolWrapper;
@@ -27,6 +28,7 @@ using RuntimeObjectUniquePtr = std::unique_ptr<T, RuntimeObjectDestroyer>;
 using CodeHolderUniquePtr = RuntimeObjectUniquePtr<CodeHolder>;
 using HostModuleUniquePtr = RuntimeObjectUniquePtr<HostModule>;
 using ModuleUniquePtr = RuntimeObjectUniquePtr<Module>;
+using EVMModuleUniquePtr = RuntimeObjectUniquePtr<EVMModule>;
 using InstanceUniquePtr = RuntimeObjectUniquePtr<Instance>;
 using IsolationUniquePtr = RuntimeObjectUniquePtr<Isolation>;
 using SymbolWrapperUniquePtr = RuntimeObjectUniquePtr<SymbolWrapper>;

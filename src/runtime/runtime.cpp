@@ -13,6 +13,7 @@
 #include "common/type.h"
 #include "entrypoint/entrypoint.h"
 #include "runtime/codeholder.h"
+#include "runtime/evm_module.h"
 #include "runtime/instance.h"
 #include "runtime/isolation.h"
 #include "runtime/module.h"
@@ -36,6 +37,8 @@ void Runtime::cleanRuntime() {
   HostModulePool.clear();
 
   ModulePool.clear();
+
+  EVMModulePool.clear();
 
   SymbolPool.destroyPool();
 
@@ -210,9 +213,59 @@ Module *Runtime::loadModule(WASMSymbol Name, CodeHolderUniquePtr CodeHolder,
   return ModulePtr;
 }
 
+MayBe<EVMModule *>
+Runtime::loadEVMModule(const std::string &Filename) noexcept {
+  if (Filename.empty()) {
+    return getError(ErrorCode::InvalidFilePath);
+  }
+
+  WASMSymbol Name = newSymbol(Filename.c_str(), Filename.size());
+  if (auto It = EVMModulePool.find(Name); It != EVMModulePool.end()) {
+    return It->second.get();
+  }
+
+  try {
+    auto Code = CodeHolder::newFileCodeHolder(*this, Filename);
+    return loadEVMModule(Name, std::move(Code));
+  } catch (const Error &Err) {
+    Stats.clearAllTimers();
+    freeSymbol(Name);
+    return Err;
+  }
+}
+
+// Before executing this function, it is necessary to ensure that name is unique
+EVMModule *Runtime::loadEVMModule(EVMSymbol Name,
+                                  CodeHolderUniquePtr CodeHolder) {
+  ZEN_ASSERT(Name);
+  ZEN_ASSERT(CodeHolder);
+
+  EVMModuleUniquePtr Mod =
+      EVMModule::newEVMModule(*this, std::move(CodeHolder));
+  // All errors in Module::newModule are thrown as exceptions, so the return
+  // value must be valid when the following line is executed
+  ZEN_ASSERT(Mod);
+  auto *ModulePtr = Mod.get();
+  ModulePtr->setName(Name);
+
+  // Ignore the return value, because the name is unique(checked in above)
+  auto EmplaceRet =
+      EVMModulePool.emplace(Name, std::forward<EVMModuleUniquePtr>(Mod));
+  if (EmplaceRet.second) {
+    return EmplaceRet.first->second.get();
+  }
+
+  return ModulePtr;
+}
+
 bool Runtime::unloadModule(const Module *Mod) noexcept {
   WASMSymbol Name = Mod->getName();
   return ModulePool.erase(Name) != 0;
+}
+
+bool Runtime::unloadEVMModule(const EVMModule *Mod) noexcept {
+  EVMSymbol Name = Mod->getName();
+  return EVMModulePool.erase(Name) != 0;
 }
 
 Isolation *Runtime::createManagedIsolation() noexcept {

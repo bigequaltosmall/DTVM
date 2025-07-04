@@ -23,6 +23,7 @@ namespace zen::runtime {
 
 class HostModule;
 class Module;
+class EVMModule;
 class Instance;
 class Runtime;
 class Isolation;
@@ -136,7 +137,19 @@ public:
              const std::string &EntryHint = "") noexcept;
 
   /// \warning not thread-safe
+  common::MayBe<EVMModule *>
+  loadEVMModule(const std::string &Filename) noexcept;
+
+  /// \warning not thread-safe
+  common::MayBe<EVMModule *> loadEVMModule(const std::string &ModName,
+                                           const void *Data,
+                                           size_t DataSize) noexcept;
+
+  /// \warning not thread-safe
   bool unloadModule(const Module *Mod) noexcept;
+
+  /// \warning not thread-safe
+  bool unloadEVMModule(const EVMModule *Mod) noexcept;
 
   Isolation *createManagedIsolation() noexcept;
 
@@ -300,6 +313,8 @@ private:
   Module *loadModule(WASMSymbol ModName, CodeHolderUniquePtr CodeHolder,
                      const std::string &EntryHint = "");
 
+  EVMModule *loadEVMModule(EVMSymbol ModName, CodeHolderUniquePtr CodeHolder);
+
   void callWasmFunctionInInterpMode(Instance &Inst, uint32_t FuncIdx,
                                     const std::vector<TypedValue> &Args,
                                     std::vector<common::TypedValue> &Results);
@@ -320,6 +335,8 @@ private:
   std::unordered_map<WASMSymbol, HostModuleUniquePtr> HostModulePool;
   // multiple module mode
   std::unordered_map<WASMSymbol, ModuleUniquePtr> ModulePool;
+
+  std::unordered_map<EVMSymbol, EVMModuleUniquePtr> EVMModulePool;
 
   std::unordered_map<Isolation *, IsolationUniquePtr> Isolations;
 

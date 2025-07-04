@@ -21,6 +21,7 @@ namespace zen {
 namespace action {
 class HostModuleLoader;
 class ModuleLoader;
+class EVMModuleLoader;
 class FunctionLoader;
 class Instantiator;
 } // namespace action
@@ -31,6 +32,7 @@ using common::WASMType;
 
 enum class ModuleType {
   WASM,
+  EVM,
   JIT,
   AOT,
   NATIVE,

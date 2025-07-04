@@ -5,6 +5,7 @@
 #define ZEN_ACTION_MODULE_LOADER_H
 
 #include "action/loader_common.h"
+#include <evmc/evmc.hpp>
 
 namespace zen::action {
 
