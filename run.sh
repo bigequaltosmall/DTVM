@@ -1,0 +1,1 @@
+./build/dtvm --format evm test.evm

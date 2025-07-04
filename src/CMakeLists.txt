@@ -134,6 +134,8 @@ add_subdirectory(action)
 add_subdirectory(entrypoint)
 add_subdirectory(runtime)
 add_subdirectory(utils)
+add_subdirectory(evmone)
+add_subdirectory(evmone_precompiles)
 
 add_library(
   dtvmcore STATIC
@@ -143,6 +145,8 @@ add_library(
   $<TARGET_OBJECTS:platform>
   $<TARGET_OBJECTS:runtime>
   $<TARGET_OBJECTS:utils>
+  $<TARGET_OBJECTS:evmone>
+  $<TARGET_OBJECTS:evmone_precompiles>
   zetaengine-c.cpp
 )
 if(NOT ZEN_ENABLE_SGX)
