@@ -172,8 +172,9 @@ int main(int argc, char *argv[]) {
 
     std::string s;
     file >> s;
+    auto hex = evmc::from_spaced_hex(s);
 
-    const evmc::bytes_view container{(uint8_t*)s.data(), (size_t)s.size()};
+    const evmc::bytes_view container{(uint8_t*)hex->data(), (size_t)hex->size()};
     
     // 创建 VM 实例
     evmc_vm* vm = evmc_create_evmone();
