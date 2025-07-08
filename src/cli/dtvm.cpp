@@ -163,14 +163,22 @@ int main(int argc, char *argv[]) {
   /// ================ Basic evm interpreter ================
 
   if (format == InputFormat::EVM) {
-    // todo: vm
-    // todo: analyze
+    // s = "60be600053"
+    std::ifstream file(Filename);
+    if (!file) {
+        std::cerr << "Failed to open bytecode.hex" << std::endl;
+        return -1;
+    }
+
     std::string s;
-    s += "60be600053";
+    file >> s;
+
     const evmc::bytes_view container{(uint8_t*)s.data(), (size_t)s.size()};
     
     // 创建 VM 实例
-    evmc_vm* vm = evmc_create_evmone();  // 假设使用 evmone
+    evmc_vm* vm = evmc_create_evmone();
+    evmc_set_option(vm, "trace", nullptr);
+  
     assert(vm != nullptr);
 
     // 初始化 host 和 message
@@ -184,13 +192,13 @@ int main(int argc, char *argv[]) {
     msg.flags = 0;
 
     // 执行字节码
+    std::cout << "[DEBUG]\n";
     auto result = evmone::baseline::execute(vm, &evmc::Host::get_interface(), host.to_context(), EVMC_SHANGHAI, &msg, container.data(), container.size());
 
     // 输出执行结果
-    std::cout << "Status: " << result.status_code << "\n";
-    std::cout << "Gas used: " << (msg.gas - result.gas_left) << "\n";
+    std::cout << "\nStatus: " << result.status_code << "\n";
+    std::cout << "Total Gas used: " << (msg.gas - result.gas_left) << "\n";
 
-    std::cout << "success\n";
     return 0;
   }
 

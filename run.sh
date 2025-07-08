@@ -1,1 +1,1 @@
-./build/dtvm --format evm test.evm
+./build/dtvm --format evm test.hex
