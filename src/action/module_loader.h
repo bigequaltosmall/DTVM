@@ -5,6 +5,7 @@
 #define ZEN_ACTION_MODULE_LOADER_H
 
 #include "action/loader_common.h"
+#include "evmc/evmc.hpp"
 
 namespace zen::action {
 
@@ -87,6 +88,21 @@ private:
   bool HasNameSection = false;
   size_t ModuleSize = 0;
 }; // class ModuleLoader
+
+class EVMModuleLoader final {
+public:
+  using Byte = std::optional<evmc::bytes>;
+
+  explicit EVMModuleLoader(runtime::EVMModule &mod, const char *data)
+        : Mod(mod), Data(evmc::from_spaced_hex(std::string(data))) {}
+    
+  void load();
+
+private:
+  runtime::EVMModule &Mod;
+  const Byte Data;
+
+}; // class EVMModuleLoader
 
 } // namespace zen::action
 

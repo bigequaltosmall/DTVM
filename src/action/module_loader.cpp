@@ -58,6 +58,12 @@ void ModuleLoader::load() {
 #endif
 }
 
+void EVMModuleLoader::load() {
+  Mod.code = Mod.initCode(Data->size());
+  std::memcpy(Mod.code, Data->data(), Data->size());
+  Mod.code_size = Data->size();
+}
+
 WASMSymbol ModuleLoader::readName() {
   uint32_t NameLen = readU32();
   Bytes NameBytes = readBytes(NameLen);

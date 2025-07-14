@@ -142,6 +142,10 @@ Module::Module(Runtime *RT) : BaseModule(RT, ModuleType::WASM), Layout(*this) {
       new utils::ThreadSafeMap<int64_t, WasmMemoryAllocator *>();
 }
 
+EVMModule::EVMModule(Runtime *RT) : BaseModule(RT, ModuleType::EVM) {
+  // do nothing
+}
+
 Module::~Module() {
   releaseMemoryAllocatorCache();
   delete ThreadLocalMemAllocatorMap;
@@ -167,6 +171,15 @@ Module::~Module() {
   destroyElemTable();
   deallocate(DataTable);
   destroyCodeTable();
+}
+
+EVMModule::~EVMModule() {
+    if (Name) {
+      this->freeSymbol(Name);
+      Name = common::WASM_SYMBOL_NULL;
+    }
+
+    deallocate(code);
 }
 
 void Module::releaseMemoryAllocatorCache() {
@@ -209,6 +222,27 @@ ModuleUniquePtr Module::newModule(Runtime &RT, CodeHolderUniquePtr CodeHolder,
   }
 
   Mod->getMemoryAllocator();
+
+  return Mod;
+}
+
+EVMModuleUniquePtr EVMModule::newEVMModule(Runtime &RT, CodeHolderUniquePtr CodeHolder) {
+  void *ObjBuf = RT.allocate(sizeof(EVMModule));
+  ZEN_ASSERT(ObjBuf);
+
+  auto *RawMod = new (ObjBuf) EVMModule(&RT);
+  EVMModuleUniquePtr Mod(RawMod);
+
+  action::EVMModuleLoader Loader(*Mod, (char *)CodeHolder->getData());
+
+  auto &Stats = RT.getStatistics();
+  auto Timer = Stats.startRecord(utils::StatisticPhase::Load);
+
+  Loader.load();
+
+  Stats.stopRecord(Timer);
+
+  Mod->CodeHolder = std::move(CodeHolder);
 
   return Mod;
 }

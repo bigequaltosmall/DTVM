@@ -52,6 +52,7 @@
 namespace zen {
 
 using WASMSymbol = uint32_t;
+using EVMSymbol = uint32_t;
 
 namespace common {
 

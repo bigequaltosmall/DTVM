@@ -164,17 +164,22 @@ int main(int argc, char *argv[]) {
 
   if (format == InputFormat::EVM) {
     // s = "60be600053"
-    std::ifstream file(Filename);
-    if (!file) {
-        std::cerr << "Failed to open bytecode.hex" << std::endl;
-        return -1;
+
+    std::unique_ptr<Runtime> RT = Runtime::newRuntime(Config);
+    if (!RT) {
+      ZEN_LOG_ERROR("failed to create runtime");
+      return exitMain(EXIT_FAILURE);
     }
 
-    std::string s;
-    file >> s;
-    auto hex = evmc::from_spaced_hex(s);
-
-    const evmc::bytes_view container{(uint8_t*)hex->data(), (size_t)hex->size()};
+    MayBe<EVMModule *> ModRet = RT->loadEVMModule(Filename);
+    if (!ModRet) {
+      const Error &Err = ModRet.getError();
+      ZEN_ASSERT(!Err.isEmpty());
+      const auto &ErrMsg = Err.getFormattedMessage(false);
+      SIMPLE_LOG_ERROR("failed to load module: %s", ErrMsg.c_str());
+      return exitMain(EXIT_FAILURE, RT.get());
+    }
+    EVMModule *Mod = *ModRet;
     
     // 创建 VM 实例
     evmc_vm* vm = evmc_create_evmone();
@@ -194,12 +199,17 @@ int main(int argc, char *argv[]) {
 
     // 执行字节码
     std::cout << "[DEBUG]\n";
-    auto result = evmone::baseline::execute(vm, &evmc::Host::get_interface(), host.to_context(), EVMC_SHANGHAI, &msg, container.data(), container.size());
+    auto result = evmone::baseline::execute(vm, &evmc::Host::get_interface(), host.to_context(), EVMC_SHANGHAI, &msg, Mod->code, Mod->code_size);
 
     // 输出执行结果
     std::cout << "\nStatus: " << result.status_code << "\n";
     std::cout << "Total Gas used: " << (msg.gas - result.gas_left) << "\n";
 
+    if (!RT->unloadEVMModule(Mod)) {
+      ZEN_LOG_ERROR("failed to unload module");
+      return exitMain(EXIT_FAILURE, RT.get());
+    }
+    
     return 0;
   }
 

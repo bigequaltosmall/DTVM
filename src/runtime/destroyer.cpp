@@ -30,6 +30,12 @@ template <> void RuntimeObjectDestroyer::operator()(Module *Ptr) {
   RT->deallocate(Ptr);
 }
 
+template <> void RuntimeObjectDestroyer::operator()(EVMModule *Ptr) {
+  Runtime *RT = Ptr->getRuntime();
+  Ptr->~EVMModule();
+  RT->deallocate(Ptr);
+}
+
 template <> void RuntimeObjectDestroyer::operator()(HostModule *Ptr) {
   Runtime *RT = Ptr->getRuntime();
   Ptr->~HostModule();
