@@ -68,7 +68,6 @@ int main(int argc, char *argv[]) {
   }
 
   std::string Filename;
-  InputFormat format;
   std::string FuncName;
   std::string EntryHint;
   std::vector<std::string> Args;
@@ -79,6 +78,7 @@ int main(int argc, char *argv[]) {
   uint32_t NumExtraCompilations = 0;
   uint32_t NumExtraExecutions = 0;
   RuntimeConfig Config;
+  InputFormat format;
   bool EnableBenchmark = false;
 
   const std::unordered_map<std::string, InputFormat> FormatMap = {
@@ -178,7 +178,7 @@ int main(int argc, char *argv[]) {
     EVMModule *Mod = *ModRet;
 
     if (!RT->unloadEVMModule(Mod)) {
-      ZEN_LOG_ERROR("failed to unload module");
+      ZEN_LOG_ERROR("failed to unload EVM module");
       return exitMain(EXIT_FAILURE, RT.get());
     }
 
