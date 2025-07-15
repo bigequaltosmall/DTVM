@@ -16,6 +16,7 @@
 namespace zen::runtime {
 
 class Module;
+class EVMModule;
 class Runtime;
 
 // allocated memory data type

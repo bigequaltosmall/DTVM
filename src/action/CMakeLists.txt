@@ -6,3 +6,4 @@ set(ACTION_SRCS instantiator.cpp interpreter.cpp compiler.cpp module_loader.cpp
 )
 
 add_library(action OBJECT ${ACTION_SRCS})
+target_link_libraries(action PUBLIC evmc::evmc)

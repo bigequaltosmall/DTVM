@@ -5,6 +5,14 @@ cmake_minimum_required(VERSION 3.16)
 
 project(ZetaEngine LANGUAGES C CXX ASM)
 
+include(FetchContent)
+FetchContent_Declare(
+  intx
+  GIT_REPOSITORY https://github.com/chfast/intx.git
+  GIT_TAG v0.13.0
+)
+FetchContent_MakeAvailable(intx)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -131,5 +139,7 @@ if(ZEN_ENABLE_SPEC_TEST)
 endif()
 
 include_directories(src)
+include_directories(${PROJECT_SOURCE_DIR}/evmc/include)
 
 add_subdirectory(src)
+add_subdirectory(evmc)
