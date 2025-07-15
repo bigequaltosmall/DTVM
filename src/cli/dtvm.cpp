@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
   uint32_t NumExtraCompilations = 0;
   uint32_t NumExtraExecutions = 0;
   RuntimeConfig Config;
-  InputFormat format;
+  InputFormat Format;
   bool EnableBenchmark = false;
 
   const std::unordered_map<std::string, InputFormat> FormatMap = {
@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
 
   try {
     CLIParser->add_option("INPUT_FILE", Filename, "input filename")->required();
-    CLIParser->add_option("--format", format, "Input format")
+    CLIParser->add_option("--format", Format, "Input format")
         ->transform(CLI::CheckedTransformer(FormatMap, CLI::ignore_case));
     CLIParser->add_option("-m,--mode", Config.Mode, "Running mode")
         ->transform(CLI::CheckedTransformer(ModeMap, CLI::ignore_case));
@@ -159,7 +159,7 @@ int main(int argc, char *argv[]) {
 
   /// ================ Basic evm interpreter ================
 
-  if (format == InputFormat::EVM) {
+  if (Format == InputFormat::EVM) {
 
     std::unique_ptr<Runtime> RT = Runtime::newRuntime(Config);
     if (!RT) {
