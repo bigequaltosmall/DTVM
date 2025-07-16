@@ -242,7 +242,7 @@ Runtime::loadEVMModule(const std::string &Filename) noexcept {
     utils::trimString(HexContent);
 
     // Decode hex string to bytes
-    auto DecodedBytes = utils::fromHex(std::string_view(HexContent));
+    auto DecodedBytes = evmc::from_hex(std::string_view(HexContent));
     if (!DecodedBytes.has_value()) {
       return getError(ErrorCode::InvalidRawData);
     }
@@ -259,6 +259,26 @@ Runtime::loadEVMModule(const std::string &Filename) noexcept {
     Stats.clearAllTimers();
     freeSymbol(Name);
     return getError(ErrorCode::FileAccessFailed);
+  }
+}
+
+MayBe<EVMModule *> Runtime::loadEVMModule(const std::string &ModName, const void *Data, size_t Size) noexcept {
+  if (ModName.empty() || !Data || !Size) {
+    return getError(ErrorCode::InvalidRawData);
+  }
+
+  EVMSymbol Name = newSymbol(ModName.c_str(), ModName.size());
+  if (auto It = EVMModulePool.find(Name); It != EVMModulePool.end()) {
+    return It->second.get();
+  }
+
+  try {
+    auto Code = CodeHolder::newRawDataCodeHolder(*this, Data, Size);
+    return loadEVMModule(Name, std::move(Code));
+  } catch (const Error &Err) {
+    Stats.clearAllTimers();
+    freeSymbol(Name);
+    return Err;
   }
 }
 

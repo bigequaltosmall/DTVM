@@ -43,8 +43,6 @@ bool readBinaryFile(const std::string &Path, std::vector<uint8_t> &Data);
 
 std::string toHex(const uint8_t *Bytes, size_t BytesCount);
 
-std::optional<std::vector<uint8_t>> fromHex(std::string_view HexStr);
-
 void trimString(std::string &Str);
 
 } // namespace zen::utils

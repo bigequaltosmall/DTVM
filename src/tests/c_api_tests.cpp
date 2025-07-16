@@ -163,6 +163,25 @@ TEST(C_API, Trap) {
   ZenDeleteRuntime(Runtime);
 }
 
+TEST(C_API, EVM) {
+  ZenEnableLogging();
+  ZenRuntimeRef Runtime = ZenCreateRuntime(&RuntimeConfig);
+  EXPECT_NE(Runtime, nullptr);
+
+  // From <project_root>/example/c_api/t2.wat
+  static uint8_t EVMBuffer[] = {
+      0x60, 0x02, 0x60, 0x01, 0x01, 0x60, 0x00, 0x52, 0x60, 0x20, 0x60, 0x00,
+      0xF3,
+  };
+  char ErrBuf[128] = {0};
+  const uint32_t ErrBufSize = sizeof(ErrBuf);
+  ZenEVMModuleRef Module = ZenLoadEVMModuleFromBuffer(
+      Runtime, "test", EVMBuffer, sizeof(EVMBuffer), ErrBuf, ErrBufSize);
+  EXPECT_NE(Module, nullptr);
+
+  ZenDeleteRuntime(Runtime);
+}
+
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
