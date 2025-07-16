@@ -52,6 +52,7 @@ typedef struct ZenRuntimeConfig {
 typedef struct ZenRuntimeConfig *ZenRuntimeConfigRef;
 typedef struct ZenOpaqueRuntime *ZenRuntimeRef;
 typedef struct ZenOpaqueModule *ZenModuleRef;
+typedef struct ZenOpaqueEVMModule *ZenEVMModuleRef;
 typedef struct ZenOpaqueHostModuleDesc *ZenHostModuleDescRef;
 typedef struct ZenOpaqueHostModule *ZenHostModuleRef;
 typedef struct ZenOpaqueIsolation *ZenIsolationRef;
@@ -129,6 +130,14 @@ ZenModuleRef ZenLoadModuleFromBuffer(ZenRuntimeRef Runtime,
                                      const char *ModuleName,
                                      const uint8_t *Code, uint32_t CodeSize,
                                      char *ErrBuf, uint32_t ErrBufSize);
+
+/// \warning not thread-safe
+ZenEVMModuleRef ZenLoadEVMModuleFromBuffer(ZenRuntimeRef Runtime,
+                                           const char *ModuleName,
+                                           const uint8_t *Code,
+                                           uint32_t CodeSize, char *ErrBuf,
+                                           uint32_t ErrBufSize);
+
 /// \warning not thread-safe
 bool ZenDeleteModule(ZenRuntimeRef Runtime, ZenModuleRef Module);
 

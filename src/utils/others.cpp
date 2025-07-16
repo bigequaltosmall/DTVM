@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "utils/others.h"
+#include <evmc/evmc.hpp>
 
 #include <cinttypes>
 #include <cstdio>
@@ -110,46 +111,11 @@ void trimString(std::string &Str) {
 }
 
 std::optional<std::vector<uint8_t>> fromHex(std::string_view HexStr) {
-  std::vector<uint8_t> Result;
-
-  // Remove 0x prefix if present
-  if (HexStr.size() >= 2 && HexStr.substr(0, 2) == "0x") {
-    HexStr = HexStr.substr(2);
-  }
-
-  // Hex string must have even length
-  if (HexStr.size() % 2 != 0) {
+  if (auto decoded = evmc::from_hex(HexStr)) {
+    return std::vector<uint8_t>(decoded->begin(), decoded->end());
+  } else {
     return std::nullopt;
   }
-
-  Result.reserve(HexStr.size() / 2);
-
-  for (size_t I = 0; I < HexStr.size(); I += 2) {
-    char High = HexStr[I];
-    char Low = HexStr[I + 1];
-
-    // Convert hex characters to values
-    auto hexCharToValue = [](char C) -> int {
-      if (C >= '0' && C <= '9')
-        return C - '0';
-      if (C >= 'A' && C <= 'F')
-        return C - 'A' + 10;
-      if (C >= 'a' && C <= 'f')
-        return C - 'a' + 10;
-      return -1;
-    };
-
-    int HighValue = hexCharToValue(High);
-    int LowValue = hexCharToValue(Low);
-
-    if (HighValue == -1 || LowValue == -1) {
-      return std::nullopt;
-    }
-
-    Result.push_back((HighValue << 4) | LowValue);
-  }
-
-  return Result;
 }
 
 } // namespace zen::utils

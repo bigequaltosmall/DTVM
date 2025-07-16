@@ -262,6 +262,28 @@ Runtime::loadEVMModule(const std::string &Filename) noexcept {
   }
 }
 
+MayBe<EVMModule *> Runtime::loadEVMModule(const std::string &ModName,
+                                          const void *Data,
+                                          size_t Size) noexcept {
+  if (ModName.empty() || !Data || !Size) {
+    return getError(ErrorCode::InvalidRawData);
+  }
+
+  EVMSymbol Name = newSymbol(ModName.c_str(), ModName.size());
+  if (auto It = EVMModulePool.find(Name); It != EVMModulePool.end()) {
+    return It->second.get();
+  }
+
+  try {
+    auto Code = CodeHolder::newRawDataCodeHolder(*this, Data, Size);
+    return loadEVMModule(Name, std::move(Code));
+  } catch (const Error &Err) {
+    Stats.clearAllTimers();
+    freeSymbol(Name);
+    return Err;
+  }
+}
+
 // Before executing this function, it is necessary to ensure that name is unique
 EVMModule *Runtime::loadEVMModule(EVMSymbol Name,
                                   CodeHolderUniquePtr CodeHolder) {

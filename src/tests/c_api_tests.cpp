@@ -1,6 +1,7 @@
 // Copyright (C) 2021-2023 the DTVM authors. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
+#include "utils/others.h"
 #include "zetaengine-c.h"
 #include "zetaengine.h"
 
@@ -159,6 +160,30 @@ TEST(C_API, Trap) {
   EXPECT_TRUE(ZenDeleteIsolation(Runtime, Isolation));
 
   EXPECT_TRUE(ZenDeleteModule(Runtime, Module));
+
+  ZenDeleteRuntime(Runtime);
+}
+
+TEST(C_API, EVM) {
+  ZenEnableLogging();
+  ZenRuntimeRef Runtime = ZenCreateRuntime(&RuntimeConfig);
+  EXPECT_NE(Runtime, nullptr);
+
+  std::string HexContent = "600260010160005260206000F3";
+
+  // trim HexContent
+  utils::trimString(HexContent);
+
+  // Decode hex string to bytes
+  auto DecodedBytes = utils::fromHex(std::string_view(HexContent));
+  EXPECT_EQ(DecodedBytes.has_value(), true);
+
+  char ErrBuf[128] = {0};
+  const uint32_t ErrBufSize = sizeof(ErrBuf);
+  ZenEVMModuleRef Module =
+      ZenLoadEVMModuleFromBuffer(Runtime, "test", DecodedBytes->data(),
+                                 DecodedBytes->size(), ErrBuf, ErrBufSize);
+  EXPECT_NE(Module, nullptr);
 
   ZenDeleteRuntime(Runtime);
 }

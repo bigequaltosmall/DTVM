@@ -14,5 +14,5 @@ load_spdlog_deps()
 git_repository(
     name = "intx",
     remote = "https://github.com/chfast/intx.git",
-    tag = "v0.12.0",
+    tag = "v0.9.3",
 )

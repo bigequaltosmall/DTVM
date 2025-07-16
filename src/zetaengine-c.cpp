@@ -111,6 +111,7 @@ static void nop() {}
 
 DEFINE_CONVERSION_FUNCTIONS(zen::runtime::Runtime, ZenRuntimeRef)
 DEFINE_CONVERSION_FUNCTIONS(zen::runtime::Module, ZenModuleRef)
+DEFINE_CONVERSION_FUNCTIONS(zen::runtime::EVMModule, ZenEVMModuleRef)
 DEFINE_CONVERSION_FUNCTIONS(zen::runtime::HostModule, ZenHostModuleRef)
 DEFINE_CONVERSION_FUNCTIONS(BuiltinModuleDesc, ZenHostModuleDescRef)
 DEFINE_CONVERSION_FUNCTIONS(zen::runtime::Isolation, ZenIsolationRef)
@@ -357,6 +358,22 @@ ZenModuleRef ZenLoadModuleFromBuffer(ZenRuntimeRef Runtime,
   ZEN_ASSERT(Runtime);
   zen::runtime::Runtime *RT = unwrap(Runtime);
   auto ModuleOrErr = RT->loadModule(ModuleName, Code, CodeSize);
+  if (!ModuleOrErr) {
+    const std::string &ErrMsg = ModuleOrErr.getError().getFormattedMessage();
+    setErrBuf(ErrBuf, ErrBufSize, ErrMsg.c_str());
+    return nullptr;
+  }
+  return wrap(*ModuleOrErr);
+}
+
+ZenEVMModuleRef ZenLoadEVMModuleFromBuffer(ZenRuntimeRef Runtime,
+                                           const char *ModuleName,
+                                           const uint8_t *Code,
+                                           uint32_t CodeSize, char *ErrBuf,
+                                           uint32_t ErrBufSize) {
+  ZEN_ASSERT(Runtime);
+  zen::runtime::Runtime *RT = unwrap(Runtime);
+  auto ModuleOrErr = RT->loadEVMModule(ModuleName, Code, CodeSize);
   if (!ModuleOrErr) {
     const std::string &ErrMsg = ModuleOrErr.getError().getFormattedMessage();
     setErrBuf(ErrBuf, ErrBufSize, ErrMsg.c_str());
