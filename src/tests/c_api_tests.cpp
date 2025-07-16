@@ -1,9 +1,9 @@
 // Copyright (C) 2021-2023 the DTVM authors. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
+#include "utils/others.h"
 #include "zetaengine-c.h"
 #include "zetaengine.h"
-#include "utils/others.h"
 
 #include <gtest/gtest.h>
 
