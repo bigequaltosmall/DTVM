@@ -3,6 +3,7 @@
 
 #include "zetaengine-c.h"
 #include "zetaengine.h"
+#include "utils/others.h"
 
 #include <gtest/gtest.h>
 

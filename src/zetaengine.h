@@ -11,7 +11,6 @@
 #include "runtime/module.h"
 #include "runtime/runtime.h"
 #include "utils/logging.h"
-#include "utils/others.h"
 #include "wni/helper.h"
 
 namespace zen {
