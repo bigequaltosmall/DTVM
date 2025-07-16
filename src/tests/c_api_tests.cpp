@@ -168,7 +168,6 @@ TEST(C_API, EVM) {
   ZenRuntimeRef Runtime = ZenCreateRuntime(&RuntimeConfig);
   EXPECT_NE(Runtime, nullptr);
 
-  // From <project_root>/example/c_api/t2.wat
   static uint8_t EVMBuffer[] = {
       0x60, 0x02, 0x60, 0x01, 0x01, 0x60, 0x00,
       0x52, 0x60, 0x20, 0x60, 0x00, 0xF3,

@@ -242,7 +242,7 @@ Runtime::loadEVMModule(const std::string &Filename) noexcept {
     utils::trimString(HexContent);
 
     // Decode hex string to bytes
-    auto DecodedBytes = evmc::from_hex(std::string_view(HexContent));
+    auto DecodedBytes = utils::fromHex(std::string_view(HexContent));
     if (!DecodedBytes.has_value()) {
       return getError(ErrorCode::InvalidRawData);
     }

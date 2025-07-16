@@ -109,4 +109,12 @@ void trimString(std::string &Str) {
   Str.erase(Str.find_last_not_of(" \n\r\t") + 1);
 }
 
+std::optional<std::vector<uint8_t>> fromHex(std::string_view HexStr) {
+  if (auto decoded = evmc::from_hex(HexStr)) {
+    return std::vector<uint8_t>(decoded->begin(), decoded->end());
+  } else {
+    return std::nullopt;
+  }
+}
+
 } // namespace zen::utils

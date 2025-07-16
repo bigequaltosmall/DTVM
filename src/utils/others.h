@@ -7,6 +7,7 @@
 #include "common/enums.h"
 #include "common/type.h"
 #include "utils/logging.h"
+#include <evmc/evmc.hpp>
 
 #include <chrono>
 #include <optional>
@@ -44,6 +45,8 @@ bool readBinaryFile(const std::string &Path, std::vector<uint8_t> &Data);
 std::string toHex(const uint8_t *Bytes, size_t BytesCount);
 
 void trimString(std::string &Str);
+
+std::optional<std::vector<uint8_t>> fromHex(std::string_view HexStr);
 
 } // namespace zen::utils
 
