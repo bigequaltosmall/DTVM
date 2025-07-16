@@ -133,9 +133,10 @@ ZenModuleRef ZenLoadModuleFromBuffer(ZenRuntimeRef Runtime,
 
 /// \warning not thread-safe
 ZenEVMModuleRef ZenLoadEVMModuleFromBuffer(ZenRuntimeRef Runtime,
-                                     const char *ModuleName,
-                                     const uint8_t *Code, uint32_t CodeSize,
-                                     char *ErrBuf, uint32_t ErrBufSize);
+                                           const char *ModuleName,
+                                           const uint8_t *Code,
+                                           uint32_t CodeSize, char *ErrBuf,
+                                           uint32_t ErrBufSize);
 
 /// \warning not thread-safe
 bool ZenDeleteModule(ZenRuntimeRef Runtime, ZenModuleRef Module);

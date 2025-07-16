@@ -367,9 +367,10 @@ ZenModuleRef ZenLoadModuleFromBuffer(ZenRuntimeRef Runtime,
 }
 
 ZenEVMModuleRef ZenLoadEVMModuleFromBuffer(ZenRuntimeRef Runtime,
-                                     const char *ModuleName,
-                                     const uint8_t *Code, uint32_t CodeSize,
-                                     char *ErrBuf, uint32_t ErrBufSize) {
+                                           const char *ModuleName,
+                                           const uint8_t *Code,
+                                           uint32_t CodeSize, char *ErrBuf,
+                                           uint32_t ErrBufSize) {
   ZEN_ASSERT(Runtime);
   zen::runtime::Runtime *RT = unwrap(Runtime);
   auto ModuleOrErr = RT->loadEVMModule(ModuleName, Code, CodeSize);

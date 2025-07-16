@@ -262,7 +262,9 @@ Runtime::loadEVMModule(const std::string &Filename) noexcept {
   }
 }
 
-MayBe<EVMModule *> Runtime::loadEVMModule(const std::string &ModName, const void *Data, size_t Size) noexcept {
+MayBe<EVMModule *> Runtime::loadEVMModule(const std::string &ModName,
+                                          const void *Data,
+                                          size_t Size) noexcept {
   if (ModName.empty() || !Data || !Size) {
     return getError(ErrorCode::InvalidRawData);
   }
