@@ -7,7 +7,6 @@
 #include "common/enums.h"
 #include "common/type.h"
 #include "utils/logging.h"
-#include <evmc/evmc.hpp>
 
 #include <chrono>
 #include <optional>

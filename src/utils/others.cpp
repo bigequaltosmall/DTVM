@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "utils/others.h"
+#include <evmc/evmc.hpp>
 
 #include <cinttypes>
 #include <cstdio>
