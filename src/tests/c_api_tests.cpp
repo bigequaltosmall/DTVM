@@ -175,9 +175,7 @@ TEST(C_API, EVM) {
 
   // Decode hex string to bytes
   auto DecodedBytes = utils::fromHex(std::string_view(HexContent));
-  if (!DecodedBytes.has_value()) {
-    return getError(ErrorCode::InvalidRawData);
-  }
+  EXPECT_EQ(DecodedBytes.has_value(), true);
 
   char ErrBuf[128] = {0};
   const uint32_t ErrBufSize = sizeof(ErrBuf);
