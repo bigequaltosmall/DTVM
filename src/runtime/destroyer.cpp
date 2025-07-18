@@ -5,8 +5,8 @@
 
 #include "action/interpreter.h"
 #include "runtime/codeholder.h"
-#include "runtime/instance.h"
 #include "runtime/evm_instance.h"
+#include "runtime/instance.h"
 #include "runtime/isolation.h"
 #include "runtime/module.h"
 #include "runtime/symbol_wrapper.h"

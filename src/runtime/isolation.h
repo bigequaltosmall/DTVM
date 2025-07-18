@@ -34,9 +34,9 @@ public:
 
   common::MayBe<Instance *> createInstance(Module &Mod,
                                            uint64_t GasLimit = 0) noexcept;
-  
-  common::MayBe<EVMInstance *> createEVMInstance(EVMModule &Mod,
-                                           uint64_t GasLimit = 0) noexcept;
+
+  common::MayBe<EVMInstance *>
+  createEVMInstance(EVMModule &Mod, uint64_t GasLimit = 0) noexcept;
 
   bool deleteInstance(Instance *Inst) noexcept;
 

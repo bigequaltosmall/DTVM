@@ -1,8 +1,8 @@
 // Copyright (C) 2021-2023 the DTVM authors. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-//#ifndef ZEN_RUNTIME_INSTANCE_H
-//#define ZEN_RUNTIME_INSTANCE_H
+// #ifndef ZEN_RUNTIME_INSTANCE_H
+// #define ZEN_RUNTIME_INSTANCE_H
 
 #include "common/errors.h"
 #include "common/traphandler.h"
@@ -56,8 +56,8 @@ private:
 
   virtual ~EVMInstance();
 
-  static EVMInstanceUniquePtr newEVMInstance(Isolation &Iso, const EVMModule &Mod,
-                                       uint64_t GasLimit = 0);
+  static EVMInstanceUniquePtr
+  newEVMInstance(Isolation &Iso, const EVMModule &Mod, uint64_t GasLimit = 0);
 
   Isolation *Iso = nullptr;
   const EVMModule *Mod = nullptr;
@@ -74,4 +74,4 @@ private:
 } // namespace runtime
 } // namespace zen
 
-//#endif // ZEN_RUNTIME_INSTANCE_H
+// #endif // ZEN_RUNTIME_INSTANCE_H

@@ -3,8 +3,8 @@
 
 #include "runtime/isolation.h"
 
-#include "runtime/instance.h"
 #include "runtime/evm_instance.h"
+#include "runtime/instance.h"
 
 extern struct WNINativeInterface_ *wni_functions();
 namespace zen::runtime {
@@ -77,8 +77,8 @@ Isolation::createEVMInstance(EVMModule &Mod, uint64_t GasLimit) noexcept {
   ZEN_ASSERT(Inst);
 
   EVMInstance *RawInst = Inst.get();
-  auto EmplaceRet =
-      EVMInstancePool.emplace(RawInst, std::forward<EVMInstanceUniquePtr>(Inst));
+  auto EmplaceRet = EVMInstancePool.emplace(
+      RawInst, std::forward<EVMInstanceUniquePtr>(Inst));
   if (!EmplaceRet.second) {
     return nullptr;
   }

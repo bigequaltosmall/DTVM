@@ -15,8 +15,9 @@ namespace zen::runtime {
 
 using namespace common;
 
-EVMInstanceUniquePtr EVMInstance::newEVMInstance(Isolation &Iso, const EVMModule &Mod,
-                                        uint64_t GasLimit) {
+EVMInstanceUniquePtr EVMInstance::newEVMInstance(Isolation &Iso,
+                                                 const EVMModule &Mod,
+                                                 uint64_t GasLimit) {
 
   Runtime *RT = Mod.getRuntime();
   void *Buf = RT->allocate(sizeof(EVMInstance), Alignment);
