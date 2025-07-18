@@ -116,7 +116,7 @@ for STACK_TYPE in ${STACK_TYPES[@]}; do
             ;;
         "evmrealsuite")
             ./tools/easm2bytecode.sh ./tests/evm_asm ./tests/evm_asm
-            ./build/dtvm --format evm tests/evm_asm/add.evm.hex
+            ./build/dtvm --format evm -m interpreter tests/evm_asm/add.evm.hex
             ;;
     esac
 done

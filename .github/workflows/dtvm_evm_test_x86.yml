@@ -70,9 +70,6 @@ jobs:
       - name: Code Format Check
         run: |
           ./tools/format.sh check
-      - name: Test Git clone
-        run: |
-          git clone https://github.com/asmjit/asmjit.git
       - name: Install llvm
         run: |
           echo "current home is $HOME"
