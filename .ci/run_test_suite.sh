@@ -53,7 +53,10 @@ case $TestSuite in
     "microsuite")
         CMAKE_OPTIONS="$CMAKE_OPTIONS -DZEN_ENABLE_SPEC_TEST=ON -DZEN_ENABLE_ASSEMBLYSCRIPT_TEST=ON -DZEN_ENABLE_CHECKED_ARITHMETIC=ON"
         ;;
-    "evmsuite")
+    "evmtestsuite")
+        CMAKE_OPTIONS="$CMAKE_OPTIONS -DZEN_ENABLE_SPEC_TEST=ON -DZEN_ENABLE_ASSEMBLYSCRIPT_TEST=ON -DZEN_ENABLE_CHECKED_ARITHMETIC=ON"
+        ;;
+    "evmrealsuite")
         CMAKE_OPTIONS="$CMAKE_OPTIONS -DZEN_ENABLE_SPEC_TEST=ON -DZEN_ENABLE_ASSEMBLYSCRIPT_TEST=ON -DZEN_ENABLE_CHECKED_ARITHMETIC=ON"
         ;;
 esac
@@ -99,7 +102,7 @@ for STACK_TYPE in ${STACK_TYPES[@]}; do
             #     cd ..
             # fi
             ;;
-        "evmsuite")
+        "evmtestsuite")
             cd build
             # run times to test cases that not happen every time
             n=20
@@ -110,6 +113,10 @@ for STACK_TYPE in ${STACK_TYPES[@]}; do
                 ./cAPITests --gtest_filter=C_API.EVM
             done
             cd ..
+            ;;
+        "evmrealsuite")
+            ./tools/easm2bytecode.sh ./tests/evm_asm ./tests/evm_asm
+            ./build/dtvm --format evm tests/evm_asm/add.evm.hex
             ;;
     esac
 done
