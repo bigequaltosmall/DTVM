@@ -5,7 +5,7 @@
 
 #include "action/interpreter.h"
 #include "runtime/codeholder.h"
-#include "runtime/evm_module.h"
+#include "runtime/evm_instance.h"
 #include "runtime/instance.h"
 #include "runtime/isolation.h"
 #include "runtime/module.h"
@@ -46,6 +46,12 @@ template <> void RuntimeObjectDestroyer::operator()(HostModule *Ptr) {
 template <> void RuntimeObjectDestroyer::operator()(Instance *Ptr) {
   Runtime *RT = Ptr->getRuntime();
   Ptr->~Instance();
+  RT->deallocate(Ptr);
+}
+
+template <> void RuntimeObjectDestroyer::operator()(EVMInstance *Ptr) {
+  Runtime *RT = Ptr->getRuntime();
+  Ptr->~EVMInstance();
   RT->deallocate(Ptr);
 }
 

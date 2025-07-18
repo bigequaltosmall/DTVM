@@ -15,6 +15,7 @@ namespace zen::runtime {
 class Module;
 class EVMModule;
 class Instance;
+class EVMInstance;
 class Runtime;
 
 typedef struct WNIEnvInternal_ {
@@ -34,7 +35,12 @@ public:
   common::MayBe<Instance *> createInstance(Module &Mod,
                                            uint64_t GasLimit = 0) noexcept;
 
+  common::MayBe<EVMInstance *>
+  createEVMInstance(EVMModule &Mod, uint64_t GasLimit = 0) noexcept;
+
   bool deleteInstance(Instance *Inst) noexcept;
+
+  bool deleteEVMInstance(EVMInstance *Inst) noexcept;
 
   bool initWasi();
   bool initNativeModuleCtx(WASMSymbol ModName);
@@ -45,6 +51,7 @@ private:
   WNIEnvInternal WniEnv;
 
   std::unordered_map<Instance *, InstanceUniquePtr> InstancePool;
+  std::unordered_map<EVMInstance *, EVMInstanceUniquePtr> EVMInstancePool;
 };
 
 } // namespace zen::runtime

@@ -9,6 +9,7 @@ set(RUNTIME_SRCS
     module.cpp
     evm_module.cpp
     instance.cpp
+    evm_instance.cpp
     codeholder.cpp
     destroyer.cpp
     memory.cpp

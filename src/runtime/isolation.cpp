@@ -3,6 +3,7 @@
 
 #include "runtime/isolation.h"
 
+#include "runtime/evm_instance.h"
 #include "runtime/instance.h"
 
 extern struct WNINativeInterface_ *wni_functions();
@@ -60,8 +61,39 @@ Isolation::createInstance(Module &Mod, uint64_t GasLimit) noexcept {
   return RawInst;
 }
 
+common::MayBe<EVMInstance *>
+Isolation::createEVMInstance(EVMModule &Mod, uint64_t GasLimit) noexcept {
+  EVMInstanceUniquePtr Inst;
+
+  auto &Stats = getRuntime()->getStatistics();
+  auto Timer = Stats.startRecord(utils::StatisticPhase::Instantiation);
+  try {
+    Inst = EVMInstance::newEVMInstance(*this, Mod, GasLimit);
+  } catch (const Error &Err) {
+    Stats.clearAllTimers();
+    return Err;
+  }
+  Stats.stopRecord(Timer);
+  ZEN_ASSERT(Inst);
+
+  EVMInstance *RawInst = Inst.get();
+  auto EmplaceRet = EVMInstancePool.emplace(
+      RawInst, std::forward<EVMInstanceUniquePtr>(Inst));
+  if (!EmplaceRet.second) {
+    return nullptr;
+  }
+
+  // todo: Storage
+
+  return RawInst;
+}
+
 bool Isolation::deleteInstance(Instance *Inst) noexcept {
   return InstancePool.erase(Inst) != 0;
+}
+
+bool Isolation::deleteEVMInstance(EVMInstance *Inst) noexcept {
+  return EVMInstancePool.erase(Inst) != 0;
 }
 
 bool Isolation::initWasi() {
