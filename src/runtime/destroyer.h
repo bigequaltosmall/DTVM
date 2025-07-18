@@ -14,6 +14,7 @@ class HostModule;
 class Module;
 class EVMModule;
 class Instance;
+class EVMInstance;
 class Isolation;
 class SymbolWrapper;
 
@@ -30,6 +31,7 @@ using HostModuleUniquePtr = RuntimeObjectUniquePtr<HostModule>;
 using ModuleUniquePtr = RuntimeObjectUniquePtr<Module>;
 using EVMModuleUniquePtr = RuntimeObjectUniquePtr<EVMModule>;
 using InstanceUniquePtr = RuntimeObjectUniquePtr<Instance>;
+using EVMInstanceUniquePtr = RuntimeObjectUniquePtr<EVMInstance>;
 using IsolationUniquePtr = RuntimeObjectUniquePtr<Isolation>;
 using SymbolWrapperUniquePtr = RuntimeObjectUniquePtr<SymbolWrapper>;
 

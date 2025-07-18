@@ -177,6 +177,22 @@ int main(int argc, char *argv[]) {
     }
     EVMModule *Mod = *ModRet;
 
+    Isolation *Iso = RT->createManagedIsolation();
+    if (!Iso) {
+      ZEN_LOG_ERROR("failed to create EVM isolation");
+      return exitMain(EXIT_FAILURE, RT.get());
+    }
+
+    MayBe<EVMInstance *> InstRet = Iso->createEVMInstance(*Mod, GasLimit);
+    if (!InstRet) {
+      const Error &Err = InstRet.getError();
+      ZEN_ASSERT(!Err.isEmpty());
+      const auto &ErrMsg = Err.getFormattedMessage(false);
+      SIMPLE_LOG_ERROR("failed to create EVM instance: %s", ErrMsg.c_str());
+      return exitMain(EXIT_FAILURE, RT.get());
+    }
+    EVMInstance *Inst = *InstRet;
+
     if (!RT->unloadEVMModule(Mod)) {
       ZEN_LOG_ERROR("failed to unload EVM module");
       return exitMain(EXIT_FAILURE, RT.get());
