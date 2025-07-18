@@ -53,6 +53,12 @@ case $TestSuite in
     "microsuite")
         CMAKE_OPTIONS="$CMAKE_OPTIONS -DZEN_ENABLE_SPEC_TEST=ON -DZEN_ENABLE_ASSEMBLYSCRIPT_TEST=ON -DZEN_ENABLE_CHECKED_ARITHMETIC=ON"
         ;;
+    "evmtestsuite")
+        CMAKE_OPTIONS="$CMAKE_OPTIONS -DZEN_ENABLE_SPEC_TEST=ON -DZEN_ENABLE_ASSEMBLYSCRIPT_TEST=ON -DZEN_ENABLE_CHECKED_ARITHMETIC=ON"
+        ;;
+    "evmrealsuite")
+        CMAKE_OPTIONS="$CMAKE_OPTIONS -DZEN_ENABLE_SPEC_TEST=ON -DZEN_ENABLE_ASSEMBLYSCRIPT_TEST=ON -DZEN_ENABLE_CHECKED_ARITHMETIC=ON"
+        ;;
 esac
 
 case $CPU_EXCEPTION_TYPE in
@@ -95,6 +101,22 @@ for STACK_TYPE in ${STACK_TYPES[@]}; do
             #     ./test_mir.sh
             #     cd ..
             # fi
+            ;;
+        "evmtestsuite")
+            cd build
+            # run times to test cases that not happen every time
+            n=20
+            if [[ $CMAKE_BUILD_TARGET != "Release" ]]; then
+                n=2
+            fi
+            for i in {1..$n}; do
+                ./cAPITests --gtest_filter=C_API.EVM
+            done
+            cd ..
+            ;;
+        "evmrealsuite")
+            ./tools/easm2bytecode.sh ./tests/evm_asm ./tests/evm_asm
+            ./build/dtvm --format evm -m interpreter tests/evm_asm/add.evm.hex
             ;;
     esac
 done
