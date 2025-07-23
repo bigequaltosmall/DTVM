@@ -4,14 +4,11 @@
 #ifndef ZEN_EVM_INTERPRETER_H
 #define ZEN_EVM_INTERPRETER_H
 
-#include "common/defines.h"
+#include "common/errors.h"
+#include "evmc/evmc.h"
 #include "intx/intx.hpp"
-#include "runtime/destroyer.h"
-#include "runtime/object.h"
-#include "utils/logging.h"
 
 #include <array>
-#include <cstdint>
 #include <map>
 #include <vector>
 
@@ -19,7 +16,6 @@ namespace zen {
 
 namespace runtime {
 class EVMInstance;
-class Runtime;
 } // namespace runtime
 
 namespace evm {
@@ -35,26 +31,27 @@ struct EVMFrame {
 
   size_t Sp = 0;
   uint64_t GasLeft = 0;
+  uint64_t GasLimit = 0;
   uint64_t Pc = 0;
   intx::uint256 Value = 0;
 
   inline void push(const intx::uint256 &V) {
     if (Sp >= MAXSTACK) {
-      throw getError(common::ErrorCode::EVMDataStackOverflow);
+      throw getError(common::ErrorCode::EVMStackOverflow);
     }
     Stack[Sp++] = V; // TODO: use EVMMemory class in the future
   }
 
   inline intx::uint256 pop() {
     if (Sp <= 0) {
-      throw getError(common::ErrorCode::EVMDataStackUnderflow);
+      throw getError(common::ErrorCode::EVMStackUnderflow);
     }
     return Stack[--Sp]; // TODO: use EVMMemory class in the future
   }
 
   inline intx::uint256 &peek(size_t Index = 0) {
     if (Index >= Sp) {
-      throw getError(common::ErrorCode::EVMDataStackPeekOutRange);
+      throw getError(common::ErrorCode::EVMStackUnderflow);
     }
     return Stack[Sp - 1 - Index]; // TODO: use EVMMemory class in the future
   }
@@ -66,11 +63,15 @@ class InterpreterExecContext {
 private:
   runtime::EVMInstance *Inst;
   std::vector<EVMFrame> FrameStack;
+  evmc_status_code Status = EVMC_SUCCESS;
+  std::vector<uint8_t> ReturnData;
 
 public:
+  bool IsJump = false;
+
   InterpreterExecContext(runtime::EVMInstance *Inst) : Inst(Inst) {}
 
-  EVMFrame *allocFrame();
+  EVMFrame *allocFrame(uint64_t GasLimit = 0);
   void freeBackFrame();
 
   EVMFrame *getCurFrame() {
@@ -82,10 +83,9 @@ public:
 
   runtime::EVMInstance *getInstance() { return Inst; }
 
-private:
-  std::vector<uint8_t> ReturnData;
+  evmc_status_code getStatus() const { return Status; }
+  void setStatus(evmc_status_code Status) { this->Status = Status; }
 
-public:
   const std::vector<uint8_t> &getReturnData() const { return ReturnData; }
   void setReturnData(std::vector<uint8_t> Data) {
     ReturnData = std::move(Data);
