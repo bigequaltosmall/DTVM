@@ -12,6 +12,7 @@
 #include "evmc/evmc.hpp"
 #include "evmc/instructions.h"
 #include "runtime/evm_instance.h"
+#include <cstddef> // for offsetof
 
 namespace COMPILER {
 
@@ -374,16 +375,12 @@ typename EVMMirBuilder::Operand EVMMirBuilder::handlePC() {
 }
 
 typename EVMMirBuilder::Operand EVMMirBuilder::handleGas() {
-  // For now, return a placeholder gas value
-  // In a full implementation, this would access the execution context
-  MType *UInt64Type =
-      EVMFrontendContext::getMIRTypeFromEVMType(EVMType::UINT64);
-  MConstant *GasConstant = MConstantInt::get(Ctx, *UInt64Type, 1000000);
-
-  MInstruction *Result =
-      createInstruction<ConstantInstruction>(false, UInt64Type, *GasConstant);
-
-  return Operand(Result, EVMType::UINT64);
+  // Generate inline gas check and deduction for GAS instruction
+  emitGasCheck(OP_GAS);
+  
+  // Get the current gas value (after deduction) and convert to U256
+  Operand GasValue = getCurrentGas();
+  return convertSingleInstrToU256Operand(GasValue.getInstr());
 }
 
 typename EVMMirBuilder::Operand EVMMirBuilder::handleAddress() {
@@ -895,6 +892,88 @@ MInstruction *EVMMirBuilder::getCurrentInstancePointer() {
   // Convert instance address back to pointer type
   return createInstruction<ConversionInstruction>(
       false, OP_inttoptr, createVoidPtrType(), InstanceAddr);
+}
+
+// ==================== Gas Management Implementation ====================
+
+void EVMMirBuilder::initGasManagement() {
+  // Get pointer to gas field in EVMInstance
+  // Assuming gas is stored in the current message at a known offset
+  MType *I64Type = EVMFrontendContext::getMIRTypeFromEVMType(EVMType::UINT64);
+  MType *I64PtrType = MPointerType::create(Ctx, *I64Type);
+  
+  MInstruction *InstancePtr = getCurrentInstancePointer();
+  
+  // Create constant offset for gas field in message
+  // This should be the actual offset of gas field in evmc_message
+  MConstant *GasOffset = MConstantInt::get(Ctx, *I64Type, 
+    offsetof(evmc_message, gas));
+  MInstruction *OffsetInstr = createInstruction<ConstantInstruction>(
+    false, I64Type, *GasOffset);
+  
+  // Calculate gas pointer: instance + message_offset + gas_offset
+  // For now, use a simplified approach assuming we can get message pointer
+  GasPtr = createInstruction<GetElementPtrInstruction>(
+    false, I64PtrType, InstancePtr, 
+    llvm::ArrayRef<MInstruction*>(OffsetInstr));
+  
+  // Create out-of-gas basic block
+  OutOfGasBB = createBasicBlock();
+  // TODO: Implement out-of-gas handling logic
+}
+
+uint64_t EVMMirBuilder::getInstructionGasCost(evmc_opcode opcode) {
+  static auto *Table = evmc_get_instruction_metrics_table(EVMC_LATEST_STABLE_REVISION);
+  return Table[opcode].gas_cost;
+}
+
+void EVMMirBuilder::emitGasCheck(evmc_opcode opcode) {
+  if (!GasPtr) {
+    initGasManagement();
+  }
+  
+  MType *I64Type = EVMFrontendContext::getMIRTypeFromEVMType(EVMType::UINT64);
+  
+  // 1. Load current gas value
+  MInstruction *CurrentGas = createInstruction<LoadInstruction>(
+    false, I64Type, GasPtr);
+  
+  // 2. Get instruction cost
+  uint64_t GasCost = getInstructionGasCost(opcode);
+  MInstruction *CostInstr = createIntConstInstruction(I64Type, GasCost);
+  
+  // 3. Check if we have enough gas
+  MInstruction *HasEnoughGas = createInstruction<CmpInstruction>(
+    false, CmpInstruction::Predicate::ICMP_UGE, &Ctx.I1Type, 
+    CurrentGas, CostInstr);
+  
+  // 4. Create continuation block for normal execution
+  MBasicBlock *ContinueBB = createBasicBlock();
+  
+  // 5. Generate conditional branch
+  createInstruction<BrInstruction>(true, HasEnoughGas, ContinueBB, OutOfGasBB);
+  
+  // 6. Switch to continuation block
+  setInsertBlock(ContinueBB);
+  
+  // 7. Subtract gas cost
+  MInstruction *NewGas = createInstruction<BinaryInstruction>(
+    false, OP_sub, I64Type, CurrentGas, CostInstr);
+  
+  // 8. Store updated gas value
+  createInstruction<StoreInstruction>(true, NewGas, GasPtr);
+}
+
+typename EVMMirBuilder::Operand EVMMirBuilder::getCurrentGas() {
+  if (!GasPtr) {
+    initGasManagement();
+  }
+  
+  MType *I64Type = EVMFrontendContext::getMIRTypeFromEVMType(EVMType::UINT64);
+  MInstruction *GasValue = createInstruction<LoadInstruction>(
+    false, I64Type, GasPtr);
+  
+  return Operand(GasValue, EVMType::UINT64);
 }
 
 } // namespace COMPILER

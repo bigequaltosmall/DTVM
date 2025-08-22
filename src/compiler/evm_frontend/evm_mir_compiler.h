@@ -439,6 +439,24 @@ private:
   // Program counter for current instruction
   uint64_t PC = 0;
 
+  // Gas management for JIT-friendly gas checking
+  MInstruction *GasPtr = nullptr;  // Pointer to current gas value in instance
+  MBasicBlock *OutOfGasBB = nullptr;  // Basic block for out-of-gas handling
+
+  // ==================== Gas Management Methods ====================
+  
+  // Initialize gas management (setup gas pointer and out-of-gas handler)
+  void initGasManagement();
+  
+  // Generate inline gas check for given opcode
+  void emitGasCheck(evmc_opcode opcode);
+  
+  // Get current gas value as operand (generates load instruction)
+  Operand getCurrentGas();
+  
+  // Get instruction gas cost
+  uint64_t getInstructionGasCost(evmc_opcode opcode);
+
   // ==================== Interface Helper Methods ====================
 
   // Helper method to get instance pointer as instruction

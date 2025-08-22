@@ -32,6 +32,7 @@ struct RuntimeFunctions {
   U256Fn GetTimestamp;
   U256Fn GetNumber;
   Bytes32Fn GetPrevRandao;
+  U256Fn GetGas;
   U256Fn GetGasLimit;
   Bytes32Fn GetChainId;
   U256Fn GetSelfBalance;
@@ -59,6 +60,7 @@ const uint8_t *evmGetCoinBase(zen::runtime::EVMInstance *Instance);
 intx::uint256 evmGetTimestamp(zen::runtime::EVMInstance *Instance);
 intx::uint256 evmGetNumber(zen::runtime::EVMInstance *Instance);
 const uint8_t *evmGetPrevRandao(zen::runtime::EVMInstance *Instance);
+intx::uint256 evmGetGas(zen::runtime::EVMInstance *Instance);
 intx::uint256 evmGetGasLimit(zen::runtime::EVMInstance *Instance);
 const uint8_t *evmGetChainId(zen::runtime::EVMInstance *Instance);
 intx::uint256 evmGetSelfBalance(zen::runtime::EVMInstance *Instance);

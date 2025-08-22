@@ -21,6 +21,7 @@ const RuntimeFunctions &getRuntimeFunctionTable() {
                                          .GetTimestamp = &evmGetTimestamp,
                                          .GetNumber = &evmGetNumber,
                                          .GetPrevRandao = &evmGetPrevRandao,
+                                         .GetGas = &evmGetGas,
                                          .GetGasLimit = &evmGetGasLimit,
                                          .GetChainId = &evmGetChainId,
                                          .GetSelfBalance = &evmGetSelfBalance,
@@ -136,6 +137,12 @@ const uint8_t *evmGetPrevRandao(zen::runtime::EVMInstance *Instance) {
     cache.tx_context_cached = true;
   }
   return cache.tx_context.block_prev_randao.bytes;
+}
+
+intx::uint256 evmGetGas(zen::runtime::EVMInstance *Instance) {
+  const evmc_message *Msg = Instance->getCurrentMessage();
+  ZEN_ASSERT(Msg && "No current message set in EVMInstance");
+  return intx::uint256(Msg->gas);
 }
 
 intx::uint256 evmGetGasLimit(zen::runtime::EVMInstance *Instance) {
